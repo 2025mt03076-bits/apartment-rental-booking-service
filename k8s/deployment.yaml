@@ -22,10 +22,15 @@ spec:
       labels:
         app: booking-service
     spec:
+      # imagePullSecrets:               #Docker Hub repo
+      #   - name: dockerhub-cred
       containers:
         - name: booking-service
           image: booking-service:1.0
           imagePullPolicy: Never   # image is built inside minikube's Docker daemon
+          # Option B: image published by the CI/CD pipeline (replace the two lines above with these)
+          # image: <dockerhub-username>/booking-service:latest
+          # imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 3002
           envFrom:
@@ -35,14 +40,18 @@ spec:
             httpGet:
               path: /health
               port: 3002
-            initialDelaySeconds: 5
-            periodSeconds: 5
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
           livenessProbe:
             httpGet:
               path: /health
               port: 3002
-            initialDelaySeconds: 15
-            periodSeconds: 10
+            initialDelaySeconds: 30
+            periodSeconds: 20
+            timeoutSeconds: 5
+            failureThreshold: 5
           resources:
             requests:
               cpu: 100m
